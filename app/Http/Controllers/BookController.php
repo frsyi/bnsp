@@ -3,17 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
-use App\Models\Author;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class BookController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $books = Book::paginate(10);
+        $query = Book::query();
+
+        // Pencarian berdasarkan judul, penulis, dan penerbit
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('judul', 'like', '%' . $request->search . '%')
+                    ->orWhere('penulis', 'like', '%' . $request->search . '%')
+                    ->orWhere('penerbit', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        // Filter berdasarkan tahun terbit
+        if ($request->filled('tahun_terbit')) {
+            $query->where('tahun_terbit', $request->tahun_terbit);
+        }
+
+        $books = $query->paginate(10);
+
         return view('books.index', compact('books'));
     }
 
@@ -35,10 +52,11 @@ class BookController extends Controller
             'judul' => 'required|string',
             'penulis' => 'required|string',
             'penerbit' => 'required|string',
-            'tahun_terbit' => 'required|regex:/^\d{4}$/',
+            'tahun_terbit' => 'required|integer|digits:4|min:1901|max:2155',
             'jumlah' => 'required|integer',
         ], [
             'kode_buku.unique' => 'Kode buku telah digunakan.',
+            'tahun_terbit.digits' => 'Tahun terbit harus terdiri dari 4 angka.',
         ]);
 
         Book::create($validated);
@@ -70,12 +88,15 @@ class BookController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'kode_buku' => 'required|string',
+            'kode_buku' => 'required|string|unique:books',
             'judul' => 'required|string',
             'penulis' => 'required|string',
             'penerbit' => 'required|string',
-            'tahun_terbit' => 'required|regex:/^\d{4}$/',
+            'tahun_terbit' => 'required|integer|digits:4|min:1901|max:2155',
             'jumlah' => 'required|integer',
+        ], [
+            'kode_buku.unique' => 'Kode buku telah digunakan.',
+            'tahun_terbit.digits' => 'Tahun terbit harus terdiri dari 4 angka.',
         ]);
 
         $book = Book::findOrFail($id);

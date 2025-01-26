@@ -30,6 +30,29 @@
                     </div>
                 </div>
 
+                <div class="p-6">
+                    <!-- Search and Filter Form -->
+                    <form method="GET" action="{{ route('books.index') }}">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                            <div>
+                                <input type="text" name="search" value="{{ request('search') }}"
+                                       placeholder="Cari berdasarkan judul, penulis, atau penerbit"
+                                       class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-gray-200">
+                            </div>
+                            <div>
+                                <input type="number" name="tahun_terbit" value="{{ request('tahun_terbit') }}"
+                                    placeholder="Cari berdasarkan tahun terbit"
+                                    class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-gray-200">
+                            </div>
+                            <div>
+                                <button type="submit" class="w-full px-4 py-2 text-white bg-gray-800 rounded-lg dark:bg-blue-600 hover:bg-gray-700">
+                                    Search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
                 <div class="relative overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -39,7 +62,7 @@
                                 <th scope="col" class="px-6 py-3">Penulis</th>
                                 <th scope="col" class="px-6 py-3">Penerbit</th>
                                 <th scope="col" class="px-6 py-3">Tahun Terbit</th>
-                                <th scope="col" class="px-6 py-3">Jumlah</th>
+                                <th scope="col" class="px-6 py-3">Stok</th>
                                 @can('admin')
                                 <th scope="col" class="px-6 py-3">Action</th>
                                 @endcan
@@ -64,7 +87,7 @@
                                         {{ $book->tahun_terbit }}
                                     </td>
                                     <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                                        {{ $book->jumlah }}
+                                        {{ $book->jumlah > 0 ? $book->jumlah : 'Sedang tidak tersedia' }}
                                     </td>
                                     @can('admin')
                                     <td class="px-6 py-4">
@@ -85,8 +108,8 @@
                                 </tr>
                             @empty
                                 <tr class="bg-white dark:bg-gray-800">
-                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 dark:text-white" colspan="6">
-                                        No books found.
+                                    <td colspan="6" class="px-6 py-4 text-center text-gray-900 dark:text-white">
+                                        Buku tidak ditemukan
                                     </td>
                                 </tr>
                             @endforelse

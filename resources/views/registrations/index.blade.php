@@ -5,14 +5,14 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-8">
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
                 <div class="p-6 text-xl text-gray-900 dark:text-gray-100">
                     <div class="flex items-center justify-between">
                         @can('peminjam')
                         <div>
-                            <x-create-button href="{{ route('registrations.create') }}" />
+                            <x-pinjam-button href="{{ route('registrations.create') }}" />
                         </div>
                         @endcan
                         <div>
@@ -41,8 +41,11 @@
                                 <th scope="col" class="px-6 py-3">Judul Buku</th>
                                 <th scope="col" class="px-6 py-3">Tanggal Pinjam</th>
                                 <th scope="col" class="px-6 py-3">Tanggal Kembali</th>
-                                <th scope="col" class="px-6 py-3">Action</th>
+                                <th scope="col" class="px-6 py-3">Cetak</th>
                                 <th scope="col" class="px-6 py-3">Status</th>
+                                @can('admin')
+                                <th scope="col" class="px-6 py-3">Action</th>
+                                @endcan
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700">
@@ -69,10 +72,10 @@
                                         <span class="text-green-600 dark:text-green-400">Dikembalikan</span>
                                     @else
                                         @can('admin')
-                                            <form action="{{ route('registrations.update-status', $peminjaman->id) }}" method="POST" style="display:inline;">
+                                            <form action="{{ route('registrations.update-status', $peminjaman->id) }}" method="POST" class="status-update-form" style="display:inline;">
                                                 @csrf
                                                 @method('PATCH')
-                                                <button type="submit" class="text-orange-500 dark:text-orange-400 hover:underline focus:outline-none">
+                                                <button type="button" class="text-orange-500 dark:text-orange-400 hover:underline focus:outline-none status-update-button">
                                                     Dipinjam
                                                 </button>
                                             </form>
@@ -81,6 +84,19 @@
                                         @endcan
                                     @endif
                                 </td>
+                                @can('admin')
+                                    <td class="px-6 py-4">
+                                        <div class="flex space-x-3">
+                                            <form action="{{ route('registrations.destroy', $peminjaman->id) }}" method="POST" class="delete-form">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="text-red-600 dark:text-red-400 delete-button">
+                                                    <x-heroicon-o-trash class="w-6 h-6"/>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                @endcan
                             </tr>
                             @empty
                             <tr class="bg-white dark:bg-gray-800">

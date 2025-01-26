@@ -21,10 +21,10 @@ class Book extends Model
         'jumlah',
     ];
 
-    public function getKodeBukuAttribute()
-    {
-        return 'B' . str_pad($this->id, 2, '0', STR_PAD_LEFT);
-    }
+    // public function getKodeBukuAttribute()
+    // {
+    //     return 'B' . str_pad($this->id, 2, '0', STR_PAD_LEFT);
+    // }
 
     public function peminjamans(): HasMany
     {

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegistrationController;
 
@@ -31,10 +32,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('books', BookController::class);
-    Route::resource('registrations', RegistrationController::class);
-    Route::patch('/registrations/{id}/update-status', [RegistrationController::class, 'updateStatus'])->name('registrations.updateStatus');
-    Route::get('registrations/cetak/{id}', [RegistrationController::class, 'cetak'])->name('registrations.cetak');
+    Route::resource('registrations', PeminjamanController::class);
+
+    Route::patch('/registrations/{peminjaman}/update-status', [PeminjamanController::class, 'updateStatus'])->name('registrations.update-status');
+    Route::get('registrations/cetak/{id}', [PeminjamanController::class, 'cetak'])->name('registrations.cetak');
 });
 
+//Route::delete('/registrations/{peminjaman}', [PeminjamanController::class, 'destroy'])->name('registrations.destroy');
+//Route::patch('/registrations/{id}/update-status', [PeminjamanController::class, 'updateStatus'])->name('registrations.updateStatus');
 
 require __DIR__ . '/auth.php';

@@ -2,64 +2,105 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Book;
 use App\Models\Peminjaman;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Auth;
 
 class PeminjamanController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
-        //
+        if (Auth::user()->is_admin) {
+            $peminjamans = Peminjaman::with('user')->paginate(10);
+        } else {
+            $peminjamans = Peminjaman::where('user_id', Auth::id())->paginate(10);
+        }
+        return view('registrations.index', compact('peminjamans'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $user = auth()->user();
+        $books = Book::where('jumlah', '>', 0)->get();
+        return view('registrations.create', compact('user', 'books'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'no_telepon' => 'required|numeric|max_digits:13',
+            'alamat' => 'required|string',
+            'book_id' => 'required|integer|exists:books,id',
+        ]);
+
+        $user = auth()->user();
+        $book = Book::findOrFail($request->book_id);
+
+        if (!$book || $book->jumlah <= 0) {
+            return redirect()->back()->with('error', 'Buku tidak tersedia untuk dipinjam.');
+        }
+
+        $book->decrement('jumlah');
+
+        $peminjaman = Peminjaman::create([
+            'user_id' => $user->id,
+            'book_id' => $request->book_id,
+            'no_telepon' => $request->no_telepon,
+            'alamat' => $request->alamat,
+            'tanggal_pinjam' => now(),
+            'tanggal_kembali' => now()->addDays(7),
+            'status' => false
+        ]);
+
+        return redirect()->route('registrations.index')->with('success', 'Peminjaman berhasil dilakukan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Peminjaman $peminjaman)
+    public function updateStatus(Peminjaman $peminjaman)
     {
-        //
+        if (!$peminjaman->status) { // Jika status masih 0 (dipinjam)
+            $peminjaman->update(['status' => true]); // Ubah status menjadi dikembalikan
+            $peminjaman->book->increment('jumlah'); // Tambahkan jumlah buku
+            return redirect()->route('registrations.index')->with('success', 'Peminjaman berhasil dikembalikan.');
+        }
+
+        return redirect()->route('registrations.index')->with('error', 'Peminjaman sudah dikembalikan sebelumnya.');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Peminjaman $peminjaman)
+    public function cetak($id)
     {
-        //
+        $peminjaman = Peminjaman::with(['user', 'book'])->findOrFail($id);
+
+        $pdf = PDF::loadView('registrations.cetak', [
+            'peminjaman' => $peminjaman,
+            'user' => $peminjaman->user
+        ]);
+
+        return $pdf->download('karturegistrasi.pdf');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Peminjaman $peminjaman)
+    public function destroy($id)
     {
-        //
-    }
+        $peminjaman = Peminjaman::findOrFail($id);
+        // Pastikan bahwa buku terkait ada
+        $book = $peminjaman->book;
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Peminjaman $peminjaman)
-    {
-        //
+        // Jika buku terkait tidak ditemukan, tampilkan error
+        if (!$book) {
+            return redirect()->route('registrations.index')->with('error', 'Buku tidak ditemukan.');
+        }
+
+        // Cek jika peminjaman terkait dengan buku yang dipinjam
+        if ($peminjaman->status == false) {
+            // Jika statusnya belum dikembalikan (masih dipinjam), kembalikan jumlah buku
+            $book->increment('jumlah');
+        }
+
+        // Hapus data peminjaman
+        $peminjaman->delete();
+
+        return redirect()->route('registrations.index')->with('success', 'Peminjaman berhasil dihapus.');
     }
 }

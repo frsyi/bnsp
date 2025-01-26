@@ -18,36 +18,41 @@
                                 :value="old('nama', $user->name)" required autofocus autocomplete="nama" />
                             <x-input-error class="mt-2" :messages="$errors->get('nama')" />
                         </div>
+
                         <div class="mb-6">
                             <x-input-label for="email" :value="__('Email')" />
                             <x-text-input id="email" name="email" type="email" class="block w-full mt-1"
                                 :value="old('email', $user->email)" required autofocus autocomplete="email" />
                             <x-input-error class="mt-2" :messages="$errors->get('email')" />
                         </div>
+
                         <div class="mb-6">
                             <x-input-label for="no_telepon" :value="__('No Telepon')" />
                             <x-text-input id="no_telepon" name="no_telepon" type="text" class="block w-full mt-1"
                                 :value="old('no_telepon')" required autofocus autocomplete="no_telepon" />
                             <x-input-error class="mt-2" :messages="$errors->get('no_telepon')" />
                         </div>
+
                         <div class="mb-6">
                             <x-input-label for="alamat" :value="__('Alamat')" />
                             <x-text-input id="alamat" name="alamat" type="text" class="block w-full mt-1"
                                 :value="old('alamat')" required autofocus autocomplete="alamat" />
                             <x-input-error class="mt-2" :messages="$errors->get('alamat')" />
                         </div>
+
                         <div class="mb-6">
                             <x-input-label for="book_id" :value="__('Buku yang Dipinjam')" />
-                            <x-select id="book_id" name="book_id" class="block w-full mt-1">
+                            <select id="book_id" name="book_id" class="block w-full mt-1 border-gray-300 rounded-lg">
                                 <option value="">Pilih Buku</option>
                                 @forelse ($books as $book)
                                     <option value="{{ $book->id }}">{{ $book->judul }} ({{ $book->jumlah }} tersedia)</option>
                                 @empty
                                     <option disabled>Tidak ada buku yang tersedia</option>
                                 @endforelse
-                            </x-select>
+                            </select>
                             <x-input-error class="mt-2" :messages="$errors->get('book_id')" />
                         </div>
+
                         <div class="mb-6">
                             <x-input-label for="tanggal_pinjam" :value="__('Tanggal Pinjam')" />
                             <x-text-input id="tanggal_pinjam" name="tanggal_pinjam" type="date" class="block w-full mt-1"
@@ -59,9 +64,10 @@
                             <x-text-input id="tanggal_kembali" name="tanggal_kembali" type="date" class="block w-full mt-1"
                                 :value="old('tanggal_kembali', \Carbon\Carbon::now()->addDays(7)->format('Y-m-d'))" disabled />
                         </div>
+
                         <div class="flex items-center gap-4">
                             <x-primary-button>{{ __('Save') }}</x-primary-button>
-                            <a href="{{ route('books.index') }}"
+                            <a href="{{ route('registrations.index') }}"
                                 class="inline-flex items-center px-4 py-2 text-xs font-semibold tracking-widest text-gray-700 uppercase transition duration-150 ease-in-out bg-white border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25">{{ __('Cancel') }}</a>
                         </div>
                     </form>
@@ -70,14 +76,20 @@
         </div>
     </div>
 
+    {{-- Script untuk Select2 --}}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function () {
-            $('#book_id').select2();
+            $('#book_id').select2({
+                placeholder: "Pilih Buku",
+                allowClear: true,
+                width: '100%' // Menyesuaikan dengan ukuran Tailwind
+            });
         });
     </script>
 </x-app-layout>
+
 
 
 

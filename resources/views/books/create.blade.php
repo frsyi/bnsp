@@ -38,7 +38,7 @@
                         </div>
                         <div class="mb-6">
                             <x-input-label for="tahun_terbit" :value="__('Tahun Terbit')" />
-                            <x-text-input id="tahun_terbit" name="tahun_terbit" type="number" min="1000" max="9999" class="block w-full mt-1"
+                            <x-text-input id="tahun_terbit" name="tahun_terbit" type="number" class="block w-full mt-1"
                                 :value="old('tahun_terbit')" required autofocus autocomplete="tahun_terbit" />
                             <x-input-error class="mt-2" :messages="$errors->get('tahun_terbit')" />
                         </div>

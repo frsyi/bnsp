@@ -14,6 +14,9 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         <script src="https://cdn.jsdelivr.net/npm/alpinejs" defer></script>
+
+        {{-- CSS Select2 --}}
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -75,6 +78,27 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             this.closest('form').submit();
+                        }
+                    });
+                });
+            });
+        </script>
+
+        <script>
+            document.querySelectorAll('.status-update-button').forEach(button => {
+                button.addEventListener('click', function () {
+                    Swal.fire({
+                        title: 'Konfirmasi Pengembalian',
+                        text: "Apakah Anda yakin ingin mengubah status peminjaman ini menjadi 'Dikembalikan'?",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#28a745',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ya, konfirmasi!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.closest('form').submit(); // Submit form jika dikonfirmasi
                         }
                     });
                 });
